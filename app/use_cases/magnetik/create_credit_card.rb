@@ -36,13 +36,14 @@ module Magnetik
         description: @actor.try(:stripe_description)
       )
     rescue Stripe::StripeError => e
+      Magnetik.logger.info "failed to save remote customer for the following reasons: #{e.message}"
       errors.add(:credit_card, "failed to save remote customer for the following reasons: #{e.message}")
       false
     end
 
     def create_local_customer
       @actor.update_attributes(stripe_customer_id: remote_customer.id).tap do |success|
-        Rails.logger.info "create_local_card Error: #{@actor.error_messages.full_messages}"
+        Magnetik.logger.info "create_local_card Error: #{@actor.errors.full_messages}"
         errors.add(:user, 'failed to save local customer') unless success
       end
     end
@@ -50,6 +51,7 @@ module Magnetik
     def create_remote_card
       @remote_card = remote_customer.sources.create(source: @token)
     rescue Stripe::CardError => e
+      Magnetik.logger.info "failed to save remote card for the following reasons: #{e.message}"
       errors.add(:credit_card, "failed to save remote card for the following reasons: #{e.message}")
       return false
     end
@@ -66,7 +68,7 @@ module Magnetik
       ))
 
       @local_card.save.tap do |success|
-        Rails.logger.info "create_local_card Error: #{@local_card.error_messages.full_messages}"
+        Magnetik.logger.info "create_local_card Error: #{@local_card.errors.full_messages}"
         errors.add(:credit_card, 'failed to save local card') unless success
       end
     end
