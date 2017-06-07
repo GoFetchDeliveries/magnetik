@@ -24,6 +24,14 @@ module Magnetik
   mattr_accessor :validation_interval
   @@validation_interval = 3.months
 
+  def self.logger
+    @@logger ||= defined?(Rails) ? Rails.logger : Logger.new(STDOUT)
+  end
+
+  def self.logger=(logger)
+    @@logger = logger
+  end
+  
   private
 
   # Default way to setup Magnetik:
