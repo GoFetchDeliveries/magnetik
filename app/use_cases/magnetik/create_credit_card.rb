@@ -18,10 +18,8 @@ module Magnetik
         create_remote_customer
         create_local_customer
       end
-
-      if @remote_customer && create_remote_card
-        create_local_card
-      end
+      
+      create_local_card if @remote_customer && create_remote_card
     end
 
     private
@@ -33,43 +31,42 @@ module Magnetik
     end
 
     def create_remote_customer
-      @remote_customer = Stripe::Customer.create({
+      @remote_customer = Stripe::Customer.create(
         email: @actor.try(:email),
         description: @actor.try(:stripe_description)
-      })
+      )
     rescue Stripe::StripeError => e
-      errors.add(:credit_card, "failed to save for the following reasons: #{e.message}")
+      errors.add(:credit_card, "failed to save remote customer for the following reasons: #{e.message}")
       false
     end
 
     def create_local_customer
       @actor.update_attributes(stripe_customer_id: remote_customer.id).tap do |success|
-        errors.add(:user, "failed to save") unless success
+        errors.add(:user, 'failed to save local customer') unless success
       end
     end
 
     def create_remote_card
       @remote_card = remote_customer.sources.create(source: @token)
     rescue Stripe::CardError => e
-      errors.add(:credit_card, "failed to save for the following reasons: #{e.message}")
+      errors.add(:credit_card, "failed to save remote card for the following reasons: #{e.message}")
       return false
     end
 
     def create_local_card
-      @local_card = CreditCard.new(card_params.merge({
+      @local_card = CreditCard.new(card_params.merge(
         customer: @actor,
         stripe_card_id: remote_card[:id],
         last_4_digits: remote_card[:last4],
         exp_month: remote_card[:exp_month],
         exp_year: remote_card[:exp_year],
         brand: remote_card[:brand],
-        last_validated_at: Time.current,
-      }))
+        last_validated_at: Time.current
+      ))
 
       @local_card.save.tap do |success|
-        errors.add(:credit_card, "failed to save") unless success
+        errors.add(:credit_card, 'failed to save local card') unless success
       end
     end
-
   end
 end
