@@ -43,8 +43,10 @@ module Magnetik
 
     def create_local_customer
       @actor.update_attributes(stripe_customer_id: remote_customer.id).tap do |success|
-        Magnetik.logger.info "create_local_card Error: #{@actor.errors.full_messages}"
-        errors.add(:user, 'failed to save local customer') unless success
+        unless success
+          Magnetik.logger.info "create_local_customer Error: #{@actor.errors.full_messages}"
+          errors.add(:user, 'failed to save local customer')
+        end
       end
     end
 
@@ -68,8 +70,10 @@ module Magnetik
       ))
 
       @local_card.save.tap do |success|
-        Magnetik.logger.info "create_local_card Error: #{@local_card.errors.full_messages}"
-        errors.add(:credit_card, 'failed to save local card') unless success
+        unless success
+          Magnetik.logger.info "create_local_card Error: #{@local_card.errors.full_messages}"
+          errors.add(:credit_card, 'failed to save local card') unless success
+        end
       end
     end
   end
