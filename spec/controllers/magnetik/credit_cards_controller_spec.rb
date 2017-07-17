@@ -44,17 +44,17 @@ module Magnetik
         allow(controller).to receive(:customer) { @customer }
         expect(CreateCreditCard).to receive(:perform).with(@customer, @card_token, {}) { @use_case }
 
-        post :create, format: :json, credit_card: { token: @card_token }
+        post :create, format: :json, params: { credit_card: { token: @card_token } }
       end
 
       context 'successful request' do
         it 'returns http success' do
-          post :create, format: :json, credit_card: { token: @card_token }
+          post :create, format: :json, params: { credit_card: { token: @card_token } }
           expect(response).to have_http_status(:created)
         end
 
         it 'returns the credit card object' do
-          post :create, format: :json, credit_card: { token: @card_token }
+          post :create, format: :json, params: { credit_card: { token: @card_token } }
           expect(json[:credit_card][:id]).not_to be_nil
         end
       end
@@ -65,12 +65,12 @@ module Magnetik
         end
 
         it 'returns http unprocessable if theres an error' do
-          post :create, format: :json, credit_card: { token: @card_token }
+          post :create, format: :json, params: { credit_card: { token: @card_token } }
           expect(response).to have_http_status(:unprocessable_entity)
         end
 
         it 'returns the errors from the use case if theres an error' do
-          post :create, format: :json, credit_card: { token: @card_token }
+          post :create, format: :json, params: { credit_card: { token: @card_token } }
           expect(json[:errors]).not_to be_nil
         end
       end
@@ -95,13 +95,13 @@ module Magnetik
       end
 
       it 'returns a 200 status' do
-        put :update, format: :json, id: @credit_card.id, credit_card: @update_params
+        put :update, format: :json, params: { id: @credit_card.id, credit_card: @update_params }
 
         expect(response.status).to eq 200
       end
 
       it 'returns the updated credit card object' do
-        put :update, format: :json, id: @credit_card.id, credit_card: @update_params
+        put :update, format: :json, params: { id: @credit_card.id, credit_card: @update_params }
 
         expect(json[:credit_card][:id]).to eq @credit_card.id
         expect(json[:credit_card][:exp_year]).to eq '2018'
@@ -111,7 +111,7 @@ module Magnetik
       it 'should fail to update with invalid details' do
         StripeMock.prepare_card_error(:card_declined, :update_source)
 
-        put :update, format: :json, id: @credit_card.id, credit_card: @update_params
+        put :update, format: :json, params: { id: @credit_card.id, credit_card: @update_params }
 
         expect(response.status).to eq 422
       end
@@ -131,7 +131,7 @@ module Magnetik
       end
 
       it 'returns a 204 status' do
-        delete :destroy, format: :json, id: @credit_card.id
+        delete :destroy, format: :json, params: { id: @credit_card.id }
         expect(response.status).to eq 204
       end
     end

@@ -7,9 +7,9 @@ require "magnetik/version"
 Gem::Specification.new do |s|
   s.name        = "magnetik"
   s.version     = Magnetik::VERSION
-  s.authors     = ["Anton Ivanopoulos"]
-  s.email       = ["ai@papercloud.com"]
-  s.homepage    = "http://www.papercloud.com.au"
+  s.authors     = ["Anton Ivanopoulos", "Anh Dao"]
+  s.email       = ["ai@papercloud.com", "frankensteinruo@gmail.com"]
+  s.homepage    = "http://www.github.com"
   s.summary     = "Rails engine for credit card management via Stripe."
   s.description = "Magnetik is a mountable rails engine that allows a model to be turned into a vessel for a Stripe customer, " <<
                   "as well as providing routes for credit card management via Stripe, including creating, updating and deleting " <<
@@ -22,6 +22,7 @@ Gem::Specification.new do |s|
   s.add_dependency 'rails', '>= 4.0.0'
   s.add_dependency 'responders'
   s.add_dependency 'stripe'
+  s.add_dependency 'rails-controller-testing'
 
   s.add_development_dependency 'sqlite3'
   s.add_development_dependency 'rspec-rails', '~> 3.0'

@@ -3,7 +3,7 @@ module Magnetik
     include UseCase
 
     def initialize(card)
-      @card       = card
+      @card = card
     end
 
     def perform

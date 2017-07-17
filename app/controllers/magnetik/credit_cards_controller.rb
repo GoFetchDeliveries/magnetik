@@ -2,7 +2,7 @@ require_dependency "magnetik/application_controller"
 
 module Magnetik
   class CreditCardsController < ApplicationController
-    before_filter :authenticate!
+    before_action :authenticate!
 
     respond_to :json
 
@@ -38,7 +38,7 @@ module Magnetik
       @use_case = DestroyCreditCard.perform(@credit_card)
 
       if @use_case.success?
-        render nothing: true, status: :no_content
+        render json: {}, status: :no_content
       else
         render json: { errors: @use_case.errors }, status: :unprocessable_entity
       end

@@ -19,6 +19,16 @@ module Magnetik
           @user.update(stripe_customer_id: @customer.id)
         end
 
+        it 'does not restrict max length' do
+          old_length = Magnetik.max_name_length
+          Magnetik.max_name_length = 4
+          credit_card = create(:credit_card, name: '1234567890')
+          credit_card.save!.tap do |success|
+            expect(success).to eq(true)
+          end
+          Magnetik.max_name_length = old_length
+        end
+
         it 'fetches a remote customer' do
           expect(Stripe::Customer).to receive(:retrieve) { @customer }
           CreateCreditCard.perform(@user, @card_token, @card_params)
